@@ -15,24 +15,9 @@ class CreateTransactionService {
   }
 
   public execute({ title, value, type }: Request): Transaction {
-    const valueBalance = {
-      income: 0,
-      outcome: 0,
-    };
+    const { total } = this.transactionsRepository.getBalance();
 
-    if (type === 'income') {
-      valueBalance.income = value;
-      valueBalance.outcome = 0;
-    } else {
-      valueBalance.income = 0;
-      valueBalance.outcome = value;
-    }
-
-    const balanceTransaction = this.transactionsRepository.getBalance(
-      valueBalance,
-    );
-
-    if (balanceTransaction.total < 0) {
+    if (type === 'outcome' && value > total) {
       throw Error('Not possible your transaction, empty money');
     }
 
